@@ -1,0 +1,7 @@
+ame: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_requ
