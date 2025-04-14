@@ -2,7 +2,7 @@
 
 ### Introducing [S-OTP](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/W%E2%80%90OTS): A Modern, Post-Quantum One-Time Password System
 
-> From [Leslie Lamport, 1979](https://www.microsoft.com/en-us/research/publication/constructing-digital-signatures-one-way-function/) to the Quantum World.
+>### From [Leslie Lamport, 1979](https://www.microsoft.com/en-us/research/publication/constructing-digital-signatures-one-way-function/) to the Quantum World.
 
 S-OTP (Signing Device One-Time Password) is a next-generation authentication system built to be quantum-secure, cryptographically signed, non-replayable, and memory-hard to attack—without relying on shared secrets or symmetric keys.
 
