@@ -1,6 +1,8 @@
 # Signing Device One-Time Password
 
-S-OTP (Signing Device One-Time Password) is a post-quantum secure authentication mechanism designed to replace traditional time-based or counter-based OTP systems that rely on shared secrets or symmetric keys. This method is purpose-built for the quantum computing era, leveraging cryptographic primitives like Winternitz One-Time Signatures (WOTS), Lamport signatures, and Merkle trees to ensure forward secrecy and resistance against both classical and quantum adversaries.
+From Leslie Lamport to Quantum world. S-OTP (Signing Device One-Time Password) is a post-quantum secure authentication mechanism designed to replace traditional time-based or counter-based OTP systems that rely on shared secrets or symmetric keys. This method is purpose-built for the quantum computing era, leveraging cryptographic Winternitz One-Time Signatures (WOTS), Lamport signatures, and Merkle trees to ensure forward secrecy and resistance against both classical and quantum adversaries.
+
+# Background
 
 ### 🚨 The Problem with Classical OTP Systems (HOTP/TOTP)
 Traditional One-Time Password (OTP) systems like HOTP (HMAC-based OTP) and TOTP (Time-based OTP) have long served as a popular second factor in multi-factor authentication. However, they show significant weaknesses in the face of modern attack techniques and the coming quantum computing era.
@@ -28,37 +30,50 @@ Traditional One-Time Password (OTP) systems like HOTP (HMAC-based OTP) and TOTP 
 
 ## Overview
 
-### ✅ How S-OTP Solves This
-S-OTP designed is for Memory Hard + Lamport OTP + Merkle Tree + Post-Quantum registration system solves the problems that plague classical OTP systems like HOTP/TOTP:
+### ✅ How This `otp` Package Solves Modern OTP Challenges
+This package implements a **Post-Quantum Secure, Memory-Hard, and Replay-Proof OTP system**
+built on Winternitz-based Lamport One-Time Signatures and Merkle trees.
 
-- Lamport One-Time Signatures, which are 256-bit secure, not guessable, and tied to a specific message.
-  - Each OTP is cryptographically signed, not just a short code. There’s no fixed OTP length to guess.
-  - Index tracking (e.g. Index: 0) ensures a one-time use of each signature and OTP.
-- Create a Merkle root hash from:
-  - UserID + DeviceID + Lamport Public Key + PQPublicKey + DeviceToken
-  - This rootHash cryptographically ties the OTP identity to a specific device and user.
-  - The deviceToken = SHA256(userID + deviceID) ensures it's non-forgeable and device-specific.
-- Lamport Signatures, which are quantum-resistant because they’re based only on hash functions.
-  - Stored and register a post-quantum public key `(PQPublicKey []byte)` for future extensions (e.g., using CRYSTALS-Dilithium or SPHINCS+).
-  - No shared secrets—just signed hashes. Even quantum attackers can’t forge a valid signature without the one-time private key.
-- No shared secret is stored. Instead:
-  - Server holds the public key (via Merkle root hash and Lamport key serialization).
-  - OTPs are verified by checking cryptographic signatures, not matching a secret-derived code.
-  - Use deterministic key generation from the deviceToken, so private keys can be recomputed on demand—not stored insecurely.
-- Lamport OTPs are one-time and message-bound.
-  - Even if a signature is captured, it cannot be reused or replayed.
-  - Future plans can integrate signed challenges or contextual metadata (like timestamps or location) into the Merkle leaf or the message being signed.
-- Each private key in Lamport OTS is used once and then discarded.
-  - Exposure of one key does not compromise previous or future OTPs.
-  - Even if one OTP/signature is stolen, only that specific one is affected.
-- A memory-hard function is designed to require a large amount of memory to compute. This protects against:
-  - Brute-force / dictionary attacks
-  - Attackers using GPU clusters or ASICs can compute billions of hashes per second. Memory-hard algorithms slow these down by requiring not just CPU cycles but also RAM, which is a more limited and expensive resource.
-- ASIC Resistance
-  - Custom hardware is great at fast computation, but increasing memory requirements makes it:
-  - Physically harder to build fast, low-cost ASICs
-  - Expensive to scale attacks economically
-- Protection against parallelization
-  - Memory-hardness reduces efficiency of parallel brute-force attacks, which would otherwise make guessing weak secrets like passwords practical.
+🔐 Core Features:
+- **Winternitz One-Time Signatures (WOTS)**:
+   - Each OTP is signed with a cryptographic signature derived from WOTS, not just a guessable code.
+   - The Winternitz base-w parameter improves efficiency over classic Lamport signatures.
+   - OTPs are bound to a message via SHAKE256 hashes, preventing replay attacks.
+   - Signatures are unforgeable without the private key, and each key is used once.
+     
+- **Merkle Tree Root as Public Key**:
+  - The public key segments (WOTS) are committed to a Merkle tree to derive a reusable `rootHash`.
+  - This root hash binds: UserID + DeviceToken + WOTS Public Key → ensuring strong user/device identity.
+  - The root serves as the system’s trust anchor for verifying OTPs.
+  
+- **Memory-Hard Argon2id Key Derivation**:
+   - Used to derive deterministic WOTS private keys from `(userID, deviceToken)` input.
+   - Prevents brute-force or dictionary attacks by requiring high memory cost to compute.
+   - Parameters adapt to platform (mobile vs server) via `SelectArgon2Params()`.
+
+- **No Shared Secrets Stored**:
+   - The server stores only public values (Merkle root, public keys).
+   - Private keys are generated on-demand, never stored.
+   - No TOTP-like shared secrets that could leak or be brute-forced.
+
+- **Replay and Forgery Resistance**:
+  - Each OTP is used once, bound to a hash of the message.
+  - Once used, the key segment is discarded — protecting future and past signatures even if compromised.
+    
+- **Post-Quantum Secure**:
+  - All signature operations use only SHAKE256 (hash-based), making them quantum-resistant.
+  - Ideal for secure OTP systems in the post-quantum era.
+
+- **Extensible Design**:
+  - Easily supports additional metadata (e.g., timestamp, geolocation) in the signed message.
+  - Optional Merkle path authentication and future Dilithium/SPHINCS+ PQ key integration.
+
+📦 Main Components in This Design :
+  - `GenerateLamportKeyPair`: Derives WOTS private/public key pairs using Argon2id and SHAKE256.
+  - `Sign`: Signs a message using base-w WOTS with checksum for message integrity.
+  -  `Argon2idHash` and `VerifyArgon2idHash`: For memory-hard password hashing and authentication.
+  - `GetExpirationTimes`: Standardized timestamp management for OTP lifecycle.
+
+✅ Result: A modern OTP system that is cryptographically signed, quantum-secure, non-replayable, memory-hard to attack, and doesn't rely on shared secrets.
 
 
