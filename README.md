@@ -121,7 +121,7 @@ Client                       Server
 
 ## 🚀 Why Choose S-OTP?
 
-- **Uncompromising Security**: Combines WOTS, Argon2id, SHAKE256, and Merkle trees.
+- **High-Level Security**: Combines WOTS, Argon2id, SHAKE256, and Merkle trees.
 - **Device-Centric Design**: Every device becomes a signing authority.
 - **Scalable Performance**: Thread-safe and transaction-aware for massive scale.
 - **Developer-Friendly**: Simple HTTP APIs, clean JSON outputs.
