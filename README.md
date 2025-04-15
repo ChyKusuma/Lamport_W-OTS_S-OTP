@@ -9,42 +9,35 @@ Client                       Server
   |                            |
   | --- POST /request_otp ---->|  (RequestOTPHandler)
   |  {user_id, device_token,   |
-  |   lamport_key}             |
+  |   lamport_key, signature}  |
   |                            |  1. Validate POST method
   |                            |  2. Decode JSON request
-  |                            |  3. Validate required fields (user_id, device_token, lamport_key)
-  |                            |  4. Check rate limit
-  |                            |  5. Fetch user by UserID (keydb.Get)
-  |                            |  6. Verify DeviceToken
-  |                            |  7. Check for unexpired OTP
-  |                            |  8. Generate OTP and nonce
-  |                            |  9. Store OTP and lamport_key with expiry
+  |                            |  3. Fetch user by UserID (keydb.Get)
+  |                            |  4. Verify DeviceToken
+  |                            |  5. Check for unexpired OTP
+  |                            |  6. Generate OTP and nonce
+  |                            |  7. Store OTP with expiry
   | <--- 200 OK -------------- |  {status, otp, nonce, expires_at, issued_at, message}
   |  {otp, nonce, ...}         |
   |                            |
-  |[✍️ Sign OTP (code:nonce)]  | 
-  |                            |
   |  --- POST /verify -------->|  (VerifyHandler)
   |  {user_id, msg, device_id, |
-  |   lamport_key,             |
-  |   pq_public_key,           |
-  |   device_token, nonce,     |
-  |   signature}               |
+  | lamport_key, pq_public_key,|
+  | device_token, nonce}       |
   |                            |  1. Validate POST method
   |                            |  2. Decode JSON request
   |                            |  3. Validate DeviceToken
   |                            |  4. Serialize LamportKey
-  |                            |  5. Compute Merkle root hash (RootHashHex(tree))
+  |                            |  5. Compute Merkle root hash (rootHash := RootHashHex(tree))
   |                            |  6. Fetch user by root_hash (keydb.GetByRootHash)
   |                            |  7. Deserialize stored LamportKey
   |                            |  8. Fetch OTP entry
   |                            |  9. Verify OTP, nonce, and expiry
-  |                            | 10. Verify client-provided signature (code:nonce)
+  |                            | 10. Sign OTP (if no signature) or verify existing signature
   |                            | 11. Mark OTP as used
-  | <--- 200 OK -------------- |  {message, root_hash, status, used, expires_at}
-  |  {root_hash, ...}          |
+  | <--- 200 OK -------------- |  {message, signature, root_hash, status, used, expires_at}
+  | {signature, root_hash, ...}|
   |                            |
-  |
 ```
 
 ## 🔐 Features
