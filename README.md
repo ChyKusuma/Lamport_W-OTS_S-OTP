@@ -22,7 +22,7 @@ Client                       Server
   | <--- 200 OK -------------- |  {status, otp, nonce, expires_at, issued_at, message}
   |  {otp, nonce, ...}         |
   |                            |
-  |  [Sign OTP (code:nonce)]   |  (Client-side)
+  |[✍️ Sign OTP (code:nonce)]  | 
   |                            |
   |  --- POST /verify -------->|  (VerifyHandler)
   |  {user_id, msg, device_id, |
