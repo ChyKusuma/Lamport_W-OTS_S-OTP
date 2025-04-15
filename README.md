@@ -17,11 +17,10 @@ Client                       Server
   |                            |  5. Check for unexpired OTP
   |                            |  6. Generate OTP and nonce
   |                            |  7. Store OTP with expiry
-  |                            |  8. Compute Merkle root hash (not used in provided code)
   | <--- 200 OK -------------- |  {status, otp, nonce, expires_at, issued_at, message}
   |  {otp, nonce, ...}         |
   |                            |
-  | --- POST /verify --------> |  (VerifyHandler)
+  |  --- POST /verify -------->|  (VerifyHandler)
   | {user_id, msg, device_id,  |
   | lamport_key, pq_public_key,|
   | device_token, nonce}       |
@@ -29,7 +28,7 @@ Client                       Server
   |                            |  2. Decode JSON request
   |                            |  3. Validate DeviceToken
   |                            |  4. Serialize LamportKey
-  |                            |  5. Compute Merkle root hash
+  |                            |  5. Compute Merkle root hash (rootHash := RootHashHex(tree))
   |                            |  6. Fetch user by root_hash (keydb.GetByRootHash)
   |                            |  7. Deserialize stored LamportKey
   |                            |  8. Fetch OTP entry
