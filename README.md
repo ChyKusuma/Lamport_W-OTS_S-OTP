@@ -20,6 +20,8 @@ Client                       Server
   | <--- 200 OK -------------- |  {status, otp, nonce, expires_at, issued_at, message}
   | {signature, otp, nonce,..} |
   |                            |
+  |                            |
+  |                            |
   |  --- POST /verify -------->|  (VerifyHandler)
   |  {user_id, msg, device_id, |
   | lamport_key, pq_public_key,|
