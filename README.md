@@ -86,6 +86,20 @@ Client                       Server
   |                            |
 ```
 
+## 🔐 Pros and Cons Comparison
+
+| **Aspect**              | **Lamport OTP**                                                                                   | **TOTP**                                                                                      | **HOTP**                                                                                      |
+|-------------------------|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| **Security Model**      | Lamport signatures (hash-based, post-quantum secure), no shared secret.                          | HMAC-based with shared secret, time-based.                                                    | HMAC-based with shared secret, counter-based.                                                 |
+| **Pros**                | - Post-quantum resistant. <br> - No shared secret, reducing server breach impact. <br> - Nonce prevents replay attacks. <br> - Device token adds authentication layer. <br> - One-time signatures prevent reuse. | - Simple and standardized (RFC 6238). <br> - Widely supported (e.g., Google Authenticator). <br> - Offline OTP generation. <br> - Short validity window (30s). | - Simple and standardized (RFC 4226). <br> - No time synchronization needed. <br> - Suitable for hardware tokens. <br> - Offline OTP generation. |
+| **Cons**                | - Complex implementation (Lamport signatures, Merkle trees, database transactions). <br> - Client must manage multiple private keys. <br> - Unverified signature storage in `/request_otp`. <br> - Server-side key generation for unsigned OTPs. <br> - Short 30s window may cause usability issues. | - Shared secret vulnerable to server breaches. <br> - No inherent replay protection. <br> - Time synchronization required. <br> - Not post-quantum secure (symmetric key halved by Grover’s algorithm). | - Shared secret vulnerable to server breaches. <br> - Counter synchronization issues. <br> - No time-based expiration increases interception risk. <br> - Not post-quantum secure. |
+| **Attack Surface**      | - Implementation errors due to complexity. <br> - Server-side random number generation for new signatures. <br> - Database integrity for OTP storage. | - Server-side secret storage. <br> - Interception within time window. <br> - Phishing if OTP is entered on malicious site. | - Server-side secret storage. <br> - Counter desynchronization. <br> - Interception without time limit. |
+| **Usability**           | Moderate: Requires client to manage keys and signatures, short OTP validity may cause timeouts.   | High: Simple for users, supported by standard apps, but requires time sync.                   | High: Simple for users, no time sync needed, but counter issues may lock out users.           |
+| **Scalability**         | High: Merkle tree supports large user bases, but key management is complex.                      | High: Simple server-side computation, but secret storage scales linearly.                     | High: Simple computation, but counter management scales linearly.                             |
+| **Post-Quantum Security** | ✅ Yes: Hash-based signatures are quantum-resistant.                                              | ⚠️ Partial: Symmetric HMAC is affected by Grover’s algorithm, but impact is limited.          | ⚠️ Partial: Same as TOTP.                                                                     |
+| **Implementation Complexity** | 🔺 High: Requires cryptographic expertise for Lamport signatures, Merkle trees, and secure key management. | ✅ Low: Standardized libraries available, minimal setup.                                      | ✅ Low: Standardized libraries, but counter sync adds complexity.                              |
+
+
 ## 🔐 Features
 
 ### ⚛️ Quantum-Resistant Cryptography with WOTS
