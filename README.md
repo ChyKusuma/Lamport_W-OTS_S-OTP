@@ -9,81 +9,39 @@ Client                       Server
   |                            |
   | --- POST /request_otp ---->|  (RequestOTPHandler)
   |  {user_id, device_token,   |
-  |   lamport_key, signature}  |
+  |   pub_key, signature,      |
+  |   timestamp}               |
   |                            |  1. Validate POST method
-  |                            |  2. Decode JSON request into OTPRequest
-  |                            |  3. Fetch user by UserID (keydb.Get)
-  |                            |  4. Validate DeviceToken (ValidateDeviceToken)
+  |                            |  2. Decode JSON into OTPRequest
+  |                            |  3. Validate timestamp (±5 minutes)
+  |                            |  4. Fetch user by UserID (keydb.Get)
+  |                            |  5. Validate DeviceToken (ValidateDeviceToken)
   |                            |     a. Fetch user from keydb
-  |                            |     b. Recompute DeviceID using GetDeviceID(providedDeviceInfo)
-  |                            |     c. Check recomputed DeviceID matches stored DeviceID
-  |                            |     d. Recompute DeviceToken with SHA3-256 (UserID, DeviceID, ServerSecret)
-  |                            |     e. Compare stored, recomputed, and provided DeviceTokens
+  |                            |     b. Recompute DeviceID using GetDeviceID
+  |                            |     c. Verify DeviceID matches stored
+  |                            |     d. Recompute DeviceToken (SHA3-256: UserID, DeviceID, ServerSecret)
+  |                            |     e. Compare stored, recomputed, provided DeviceTokens
   |                            |     f. Clean up sensitive data (ZeroBytes)
-  |                            |  5. Validate OTP (ValidateOTP)
-  |                            |     a. Check for unexpired or active OTP (otpdb.GetOTP)
+  |                            |  6. Validate Public Key
+  |                            |     a. Decode provided pub_key (hex)
+  |                            |     b. Compare with stored PubKey
+  |                            |  7. Verify Signature
+  |                            |     a. Decode signature
+  |                            |     b. Verify signature with pub_key (otp.Verify: user_id:device_token:timestamp)
+  |                            |  8. Validate OTP (ValidateOTP)
+  |                            |     a. Check for unexpired/active OTP (otpdb.GetOTP)
   |                            |     b. Return conflict if active OTP exists
-  |                            |  6. Randomly select OTP length (6, 8, or 10 digits)
-  |                            |  7. Generate OTP and nonce (otp.GenerateOTP)
-  |                            |  8. Store OTP, nonce, signature, timestamps (otpdb.StoreOTPWithExpiry)
-  |                            |     Note: Signature is stored but NOT verified
-  |                            |  9. Log OTP generation details
-  |                            | 10. Clean up sensitive data (Zero2DBytes, clear strings)
-  | <--- 200 OK -------------- |  {status, otp, nonce, expires_at, issued_at, message}
-  |  {status: "OTP issued",    |
-  |   otp, nonce, expires_at,  |
-  |   issued_at, message}      |
-  |                            |
-  |                            |
-  | --- POST /verify --------->|  (VerifyHandler)
-  |  {user_id, msg, device_id, |
-  |   lamport_key, pub_key,    |
-  |   device_token, nonce}     |
-  |                            |  1. Validate POST method
-  |                            |  2. Decode JSON request into VerifyRequest
-  |                            |  3. Validate DeviceToken (ValidateDeviceToken)
-  |                            |     a. Fetch user from keydb
-  |                            |     b. Recompute DeviceID using GetDeviceID(providedDeviceInfo)
-  |                            |     c. Check recomputed DeviceID matches stored DeviceID
-  |                            |     d. Recompute DeviceToken with SHA3-256 (UserID, DeviceID, ServerSecret)
-  |                            |     e. Compare stored, recomputed, and provided DeviceTokens
-  |                            |     f. Clean up sensitive data (ZeroBytes)
-  |                            |  4. Validate OTP (ValidateOTP)
-  |                            |     a. Check OTP exists, is active, and not expired (otpdb.GetOTP)
-  |                            |     b. Return appropriate error (404, 410, 400) if invalid
-  |                            |  5. Lock otpRootHashMutex
-  |                            |  6. Serialize provided LamportKey (otp.SerializeKey)
-  |                            |  7. Prepare inputs for Merkle tree (UserID, DeviceID, serializedKey, DeviceToken)
-  |                            |  8. Build Merkle tree leaves (BuildLeaves)
-  |                            |  9. Construct Merkle tree (BuildTree)
-  |                            | 10. Compute root hash (RootHashHex)
-  |                            | 11. Fetch user by root_hash (keydb.GetByRootHash)
-  |                            | 12. Deserialize stored LamportKey (otp.DeserializeKey)
-  |                            | 13. Begin database transaction (up to 3 retries)
-  |                            |     a. Fetch OTP entry with write lock (otpdb.GetOTPByCode)
-  |                            |     b. Verify nonce matches stored nonce
-  |                            |     c. Check OTP not used or burned
-  |                            |     d. Check OTP not expired
-  |                            |     e. Verify OTP code (msg == Code)
-  |                            |     f. If signature exists in OTP entry:
-  |                            |        - Decode signature (otp.DecodeSignature)
-  |                            |        - Flatten stored LamportKey (Flatten)
-  |                            |        - Verify signature (otp.Verify) using Code:Nonce and flattened stored key
-  |                            |     g. If no signature exists:
-  |                            |        - Generate new Lamport key pair (otp.GenerateLamportKeyPair)
-  |                            |        - Sign Code:Nonce (otp.Sign)
-  |                            |        - Encode signature (otp.EncodeSignature)
-  |                            |        - Update OTP with signature, mark as used and burned (otpdb.Update)
-  |                            |     h. Commit transaction
-  |                            | 14. Unlock otpRootHashMutex
-  |                            | 15. Log verification details
-  |                            | 16. Clean up sensitive data (ZeroBytes, Zero2DBytes)
-  | <--- 200 OK -------------- |  {message, signature, root_hash, status, used, expires_at, signed_message}
-  |  {message: "OTP verified", |
-  |   signature, root_hash,    |
-  |   status: "success", used, |
-  |expires_at, signed_message} |
-  |                            |
+  |                            |  9. Generate OTP
+  |                            |     a. Randomly select length (6, 8, or 10 digits)
+  |                            |     b. Generate OTP and nonce (otp.GenerateOTP)
+  |                            | 10. Store OTP (otpdb.StoreOTPWithExpiry)
+  |                            |     a. Store OTP, nonce, signature, pub_key, issued_at, expires_at
+  |                            | 11. Log OTP generation
+  |                            | 12. Clean up sensitive data (ZeroBytes)
+  | <--- 200 OK -------------- |  {status: "OTP issued", otp, nonce, expires_at, issued_at, message}
+  |  {status, otp, nonce,      |
+  |   expires_at, issued_at,   |
+  |   message}                 |
 ```
 
 ## 🔐 Pros and Cons Comparison
