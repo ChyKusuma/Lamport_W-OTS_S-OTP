@@ -5,43 +5,98 @@
 Ideal for financial platforms, e-commerce, and enterprise-grade apps, this lightweight, scalable Go package delivers secure, reliable, and post-quantum ready authentication
 
 ```bash
-Client                       Server
-  |                            |
-  | --- POST /request_otp ---->|  (RequestOTPHandler)
-  |  {user_id, device_token,   |
-  |   pub_key, signature,      |
-  |   timestamp}               |
-  |                            |  1. Validate POST method
-  |                            |  2. Decode JSON into OTPRequest
-  |                            |  3. Validate timestamp (±5 minutes)
-  |                            |  4. Fetch user by UserID (keydb.Get)
-  |                            |  5. Validate DeviceToken (ValidateDeviceToken)
-  |                            |     a. Fetch user from keydb
-  |                            |     b. Recompute DeviceID using GetDeviceID
-  |                            |     c. Verify DeviceID matches stored
-  |                            |     d. Recompute DeviceToken (SHA3-256: UserID, DeviceID, ServerSecret)
-  |                            |     e. Compare stored, recomputed, provided DeviceTokens
-  |                            |     f. Clean up sensitive data (ZeroBytes)
-  |                            |  6. Validate Public Key
-  |                            |     a. Decode provided pub_key (hex)
-  |                            |     b. Compare with stored PubKey
-  |                            |  7. Verify Signature
-  |                            |     a. Decode signature
-  |                            |     b. Verify signature with pub_key (otp.Verify: user_id:device_token:timestamp)
-  |                            |  8. Validate OTP (ValidateOTP)
-  |                            |     a. Check for unexpired/active OTP (otpdb.GetOTP)
-  |                            |     b. Return conflict if active OTP exists
-  |                            |  9. Generate OTP
-  |                            |     a. Randomly select length (6, 8, or 10 digits)
-  |                            |     b. Generate OTP and nonce (otp.GenerateOTP)
-  |                            | 10. Store OTP (otpdb.StoreOTPWithExpiry)
-  |                            |     a. Store OTP, nonce, signature, pub_key, issued_at, expires_at
-  |                            | 11. Log OTP generation
-  |                            | 12. Clean up sensitive data (ZeroBytes)
-  | <--- 200 OK -------------- |  {status: "OTP issued", otp, nonce, expires_at, issued_at, message}
-  |  {status, otp, nonce,      |
-  |   expires_at, issued_at,   |
-  |   message}                 |
+Client                              Server
+  |                                  |
+  | --- POST /register ------------->|  (RegisterHandler)
+  |  {user_id, device_id,            |
+  |   device_info, pub_key,          |
+  |   seed_or_key, is_seed}          |
+  |                                  |  1. Validate POST method
+  |                                  |  2. Decode JSON into RegisterRequest
+  |                                  |  3. Validate user_id, device_id, pub_key
+  |                                  |  4. Store user in keydb (keydb.Store)
+  |                                  |     a. Store user_id, pub_key, device_id
+  |                                  |     b. Generate device_token
+  |                                  |     c. Compute root_hash (Merkle tree)
+  |                                  |  5. Log registration
+  | <--- 201 Created ----------------|  {device_id, device_token, root_hash}
+  |  {device_id, device_token,       |
+  |   root_hash}                     |
+  |                                  |
+  |  6. Store private key in LevelDB |
+  |     (keyManager.StoreKey)        |
+  |  7. Write private key to .dat    |
+  |     file (secure permissions)    |
+  |  8. Update state with device_id, |
+  |     device_token, root_hash,     |
+  |     public_key, private_key      |
+  |                                  |
+  | --- POST /request_otp ---------->|  (RequestOTPHandler)
+  |  {user_id, device_token,         |
+  |   pub_key, signature,            |
+  |   timestamp, key_choice,         |
+  |   seed_or_key}                   |
+  |                                  |  1. Validate POST method
+  |                                  |  2. Decode JSON into RequestOTPRequest
+  |                                  |  3. Validate timestamp (±5 minutes)
+  |                                  |  4. Fetch user by user_id (keydb.Get)
+  |                                  |  5. Validate device_token
+  |                                  |     a. Recompute device_id (GetDeviceID)
+  |                                  |     b. Recompute device_token (SHA3-256)
+  |                                  |     c. Compare stored, recomputed, provided tokens
+  |                                  |  6. Validate public key
+  |                                  |     a. Decode pub_key (hex)
+  |                                  |     b. Compare with stored pub_key
+  |                                  |  7. Verify signature
+  |                                  |     a. Decode signature
+  |                                  |     b. Verify with pub_key (lamport.Verify)
+  |                                  |  8. Validate OTP (otpdb.GetOTP)
+  |                                  |     a. Check for unexpired/active OTP
+  |                                  |     b. Return 409 Conflict if active OTP exists
+  |                                  |  9. Generate OTP
+  |                                  |     a. Select length (6, 8, or 10 digits)
+  |                                  |     b. Generate OTP and nonce
+  |                                  | 10. Store OTP in otpdb (StoreOTPWithExpiry)
+  |                                  |     a. Store OTP, nonce, signature, pub_key, issued_at, expires_at
+  |                                  | 11. Log OTP generation
+  |                                  | 12. Clean up sensitive data (ZeroBytes)
+  | <--- 200 OK ---------------------|  {status: "OTP issued", otp, nonce, expires_at, issued_at}
+  |  {status, otp, nonce,            |
+  |   expires_at, issued_at}         |
+  |                                  |
+  | --- POST /verify --------------->|  (VerifyHandler)
+  |  {user_id, device_id,            |
+  |   device_token, msg (otp),       |
+  |   nonce, signature, pub_key}     |
+  |                                  |  1. Validate POST method
+  |                                  |  2. Decode JSON into VerifyRequest
+  |                                  |  3. Validate required fields
+  |                                  |  4. Validate OTP status (otpdb.GetOTPByCode)
+  |                                  |     a. Check if OTP is active, expired, or burned
+  |                                  |     b. Return 410 Gone if expired/burned
+  |                                  |     c. Return 404 Not Found if OTP not found
+  |                                  |  5. Fetch user by user_id (keydb.Get)
+  |                                  |  6. Validate public key
+  |                                  |     a. Decode pub_key (hex or base64)
+  |                                  |     b. Compare with stored pub_key
+  |                                  |  7. Validate nonce (match with OTP's nonce)
+  |                                  |  8. Verify signature
+  |                                  |     a. Construct message (otp:nonce)
+  |                                  |     b. Decode signature
+  |                                  |     c. Verify with pub_key (lamport.Verify)
+  |                                  |  9. Compute Merkle root hash
+  |                                  |     a. Build leaves (user_id, device_id, device_token)
+  |                                  |     b. Construct Merkle tree
+  |                                  |     c. Compute root_hash
+  |                                  | 10. Update OTP status (otpdb)
+  |                                  |     a. Mark as used, burned, verified
+  |                                  | 11. Trigger OTP burned event
+  |                                  | 12. Log verification
+  | <--- 200 OK ---------------------|  {message: "OTP successfully verified", signature, root_hash, status, used, expires_at, signed_message, key_update_allowed}
+  |  {message, signature, root_hash, |
+  |   status, used, expires_at,      |
+  |   signed_message,                |
+  |   key_update_allowed}            |
 ```
 
 ## 🔐 Pros and Cons Comparison
