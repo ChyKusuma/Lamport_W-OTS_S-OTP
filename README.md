@@ -13,8 +13,8 @@ Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and w
 
 ![registration process](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/blob/main/.github/workflows/classical%20otp/CLASSIC%20OTP.png)
 
-# Note
-* This project is not open-source.
+# Terms & Condition of this software
+* This software is not open-source.
 * The source code is not publicly available in this repository, as the software is intended for commercial use and direct sale.
 * A working demo is provided in this repository for evaluation purposes. You can explore it in the listed directories.
 * If you are interested in purchasing the full source code, please send a request via email to qryptopunk@protonmail.com.
