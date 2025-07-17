@@ -9,7 +9,7 @@
 * [Cryptography](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/One%E2%80%90time-key-pair-generation)
 
 # Summary
-Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and with or not used asymetric primitive cryptographic keys like [FIDO](https://fidoalliance.org/fido2/) can be vulnerable to interception, bypass, or even QC can finding corrected ECC/RAS private key from public key such like $$(Q=k*P)$$, especially in a future with powerful quantum computers.
+Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and with or not used asymetric primitive cryptographic keys like [FIDO](https://fidoalliance.org/fido2/) can be vulnerable to interception, bypass, or even QC can finding corrected ECC (Also RSA) private key from public key such like $$(Q=k*P)$$ for ECC, especially in a future with powerful quantum computers.
 
 ![registration process](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/blob/main/.github/workflows/classical%20otp/CLASSIC%20OTP.png)
 
