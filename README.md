@@ -14,10 +14,11 @@ Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and w
 ![registration process](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/blob/main/.github/workflows/classical%20otp/CLASSIC%20OTP.png)
 
 # Note
-This project is not open-source;
-* The source code is not publicly available in this repository, as this software is intended for commercial use and sale.
-* A working demo is provided in the repository for evaluation purposes only you can find in the list of directory.
+* This project is not open-source.
+* The source code is not publicly available in this repository, as the software is intended for commercial use and direct sale.
+* A working demo is provided in this repository for evaluation purposes. You can explore it in the listed directories.
 * If you are interested in purchasing the full source code, please send a request via email to qryptopunk@protonmail.com.
-* Worldwide payments are accepted in Bitcoin. Once payment is confirmed, the author will deliver the complete source code package directly to the buyer.
-* The softare is not passing secuity audited for yet, to matched with your requirement and passing security audited you can do it by your intern.
-* The software written in fully Golang for backend-frontend and has been well test their functionallity as shown in the directory.
+* Worldwide payments are accepted in Bitcoin. Once payment is confirmed, the full source code package will be delivered to the buyer.
+* Please note: This is not a license sale or exclusive distribution. The author retains the right to sell the same software to other interested parties or organizations.
+* The software has not undergone an external security audit. If required, you may conduct your own audit to meet your internal security standards.
+* The project is developed entirely in Go (Golang), covering both backend and frontend, and its functionality has been thoroughly tested as demonstrated in the demo directory.
