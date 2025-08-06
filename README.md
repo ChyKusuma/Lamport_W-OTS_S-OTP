@@ -4,7 +4,7 @@
 * [Introduction](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/What-is-S%E2%80%90OTP%3F)
 * [Register models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Register-Handler)
 * [Request models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Request-Handler)
-* * [Verification  models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Verify-Handler)
+* [Verification  models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Verify-Handler)
 * [Signature models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Winternitz-One%E2%80%90Time-Signature)
 
 # Summary
