@@ -4,8 +4,8 @@
 * [Introduction](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/What-is-S%E2%80%90OTP%3F)
 * [Register models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Register-Handler)
 * [Request models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Request-Handler)
+* * [Verification  models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Verify-Handler)
 * [Signature models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Winternitz-One%E2%80%90Time-Signature)
-* [Verification  models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Verify-Handler)
 
 # Summary
 Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and with or not used asymetric primitive cryptographic keys like [FIDO](https://fidoalliance.org/fido2/) can be vulnerable to interception, bypass, or even QC can finding corrected ECC (Also RSA) private key from public key such like $$(Q=k*P)$$ for ECC, especially in a future with powerful quantum computers.
