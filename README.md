@@ -2,7 +2,7 @@
 
 # Directory
 * [Introduction](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/What-is-S%E2%80%90OTP%3F)
-* [Simple integration:](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Simple-User-&-Client-integration)
+* [Simple integration](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Simple-User-&-Client-integration)
 * [Register models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Register-Handler)
 * [Request models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Request-Handler)
 * [Verification  models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Verify-Handler)
