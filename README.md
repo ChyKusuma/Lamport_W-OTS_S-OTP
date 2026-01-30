@@ -10,6 +10,7 @@
 
 # Summary
 Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and with or not used asymetric primitive cryptographic keys like [FIDO](https://fidoalliance.org/fido2/) can be vulnerable to interception, bypass, or even QC can finding corrected ECC (Also RSA) private key from public key such like;
+* Computes $$d$$ given $$y$$ = $$x^d$$ mod $$p$$ → ECC/DH Dead
 * Computes $$k$$ given $$Q$$ = $$k⋅P$$ → ECDLP Dead
 * Computes $$p$$ given $$n$$ = $$pq$$ → RSA Dead
 
