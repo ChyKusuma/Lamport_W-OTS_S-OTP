@@ -15,7 +15,7 @@ Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and w
 
 Especially in the near future, in the presence of quantum-capable adversaries.
 
-![Classical signed OTP](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/blob/main/.github/workflows/classical%20otp/OTP%20PQC-2.png)
+![Classical signed OTP](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/blob/main/.github/workflows/classical%20otp/OTP%20PQC-4.png)
 
 # Terms & Condition of this software
 * This software is not open-source.
