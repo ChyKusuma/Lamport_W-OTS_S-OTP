@@ -14,7 +14,7 @@ Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and w
 * Computes $$k$$ given $$Q$$ = $$k⋅P$$ → ECDLP Dead
 * Computes $$p$$ given $$n$$ = $$pq$$ → RSA Dead
 
-Read ![JP aumasson](https://www.aumasson.jp/data/talks/AUB-quantum25.pdf)
+Read https://www.aumasson.jp/data/talks/AUB-quantum25.pdf
 
 Especially in the near future, in the presence of quantum-capable adversaries.
 
