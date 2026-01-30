@@ -9,10 +9,12 @@
 * [Signature models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Winternitz-One%E2%80%90Time-Signature)
 
 # Summary
-Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and with or not used asymetric primitive cryptographic keys like [FIDO](https://fidoalliance.org/fido2/) can be vulnerable to interception, bypass, or even QC can finding corrected ECC (Also RSA) private key from public key such like;
+Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and with or not used asymetric primitive cryptographic keys like [FIDO](https://fidoalliance.org/fido2/) can be vulnerable to interception, bypass, or even QC can finding corrected ECC RSA ECDLP private key from public key such like;
 * Computes $$d$$ given $$y$$ = $$x^d$$ mod $$p$$ → ECC/DH Dead
 * Computes $$k$$ given $$Q$$ = $$k⋅P$$ → ECDLP Dead
 * Computes $$p$$ given $$n$$ = $$pq$$ → RSA Dead
+
+(https://www.aumasson.jp/data/talks/AUB-quantum25.pdf)
 
 Especially in the near future, in the presence of quantum-capable adversaries.
 
