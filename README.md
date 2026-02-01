@@ -1,6 +1,7 @@
 # A Modern, Post-Quantum One-Time Password System
 
 # Directory
+* [Whitepaper](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/blob/main/.github/workflows/whitepaper/WP_SOTP_001.pdf)
 * [Introduction](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/What-is-S%E2%80%90OTP%3F)
 * [Simple integration](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Simple-User-&-Client-integration)
 * [Register models](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/wiki/Register-Handler)
