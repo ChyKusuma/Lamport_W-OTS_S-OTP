@@ -17,8 +17,6 @@ Traditional TOTP (Time-based One-Time Passwords) which relies on symmetric and w
 
 Read https://www.aumasson.jp/data/talks/AUB-quantum25.pdf
 
-Especially in the near future, in the presence of quantum-capable adversaries.
-
 ![Classical signed OTP](https://github.com/ChyKusuma/Lamport_W-OTS_S-OTP/blob/main/.github/workflows/classical%20otp/OTP%20PQC-4.png)
 
 # Terms & Condition of this software
